@@ -1,15 +1,18 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.url
+import com.jessecorbett.diskord.api.rest.CreateDM
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
 import com.jessecorbett.diskord.dsl.command
-import com.jessecorbett.diskord.util.authorId
-import com.jessecorbett.diskord.util.changeNickname
-import com.jessecorbett.diskord.util.words
+import com.jessecorbett.diskord.dsl.embed
+import com.jessecorbett.diskord.util.*
 import com.junron.pyrobase.msauth.Either
 import com.junron.pyrobase.msauth.User
 import com.junron.pyrobase.msauth.verify
+fun String.capitalizeWords(): String =
+    split(" ").joinToString(" ") { it.capitalize() }
 
 object Verify : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -32,6 +35,7 @@ object Verify : Command {
                             null
                         }
                     } ?: return@command
+                    val name = user.name.toLowerCase().capitalizeWords()
 
                     if (user.exp < System.currentTimeMillis() / 1000) {
                         reply("Error: Token expired")
@@ -43,11 +47,37 @@ object Verify : Command {
                     )
                     clientStore.guilds[config.guildId].changeNickname(
                         authorId,
-                        user.name
+                        name
                     )
-                    reply("Welcome, ${user.name}")
+                    reply("Welcome, $name")
+                }
+
+                command("sendverify"){
+                    sendVerifyMessage(bot, authorId)
                 }
             }
+        }
+    }
+
+    suspend fun sendVerifyMessage(bot: Bot, userId: String) {
+        with(bot) {
+            val channel = clientStore.discord.createDM(CreateDM(userId))
+            val desc = """
+                        Welcome to the AppVenture Discord!
+                        
+                        To complete verification, click [this link]($url${Math.random()}) then send the result here.
+                        Alternatively, you can DM any exco to complete verification manually.
+                        
+                        [Learn more](https://auth0.com/docs/flows/guides/implicit/add-login-implicit)
+                    """.trimIndent()
+            clientStore.channels[channel.id].sendMessage(
+                "",
+                embed {
+                    title = "AppVenture Verification"
+                    description = desc
+                    color = Colors.GREEN
+                }
+            )
         }
     }
 

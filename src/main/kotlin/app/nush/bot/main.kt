@@ -47,24 +47,8 @@ suspend fun main() {
         }
 
         userJoinedGuild {
-            val user = it.user ?: return@userJoinedGuild
-            val channel = clientStore.discord.createDM(CreateDM(user.id))
-            val desc = """
-                        Welcome to the AppVenture Discord!
-                        
-                        To complete verification, click [this link]($url${random()}) then send the result here.
-                        Alternatively, you can DM any exco to complete verification manually.
-                        
-                        [Learn more](https://auth0.com/docs/flows/guides/implicit/add-login-implicit)
-                    """.trimIndent()
-            clientStore.channels[channel.id].sendMessage(
-                "",
-                embed {
-                    title = "AppVenture Verification"
-                    description = desc
-                    color = Colors.GREEN
-                }
-            )
+            val userId = it.user?.id ?: return@userJoinedGuild
+            Verify.sendVerifyMessage(this, userId)
         }
     }
 }
