@@ -14,12 +14,17 @@ shadowJar {
 repositories {
     mavenCentral()
     jcenter()
+
+    maven {
+        url = "https://junron-public-maven-repo.s3-ap-southeast-1.amazonaws.com/release"
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
     implementation "com.jessecorbett:diskord:1.7.1"
+    implementation "com.junron.pyrobase:ms-auth:1.0"
     implementation "ch.qos.logback:logback-classic:1.2.3"
 }
 mainClassName = "app.nush.bot.MainKt"
