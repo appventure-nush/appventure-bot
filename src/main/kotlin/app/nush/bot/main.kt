@@ -28,7 +28,7 @@ val helpText = """
 """.trimIndent()
 
 const val url =
-    "http://login.microsoftonline.com/d72a7172-d5f8-4889-9a85-d7424751592a/oauth2/authorize?client_id=9f1a352a-8217-4a32-a4d3-d3c06d7b8581&redirect_uri=https://demo.chatbox2.ml/&response_type=id_token&nonce="
+    "http://login.microsoftonline.com/d72a7172-d5f8-4889-9a85-d7424751592a/oauth2/authorize?client_id=9f1a352a-8217-4a32-a4d3-d3c06d7b8581&redirect_uri=https://verify.nush.app/&response_type=id_token&nonce="
 @ExperimentalStdlibApi
 @UnstableDefault
 suspend fun main() {

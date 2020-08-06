@@ -7,7 +7,7 @@ import com.jessecorbett.diskord.api.rest.CreateGuildRole
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
 import com.jessecorbett.diskord.dsl.command
-import com.jessecorbett.diskord.util.computePermissions
+import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 
 object Projects : Command {
@@ -16,9 +16,9 @@ object Projects : Command {
             with(prefix) {
                 command("create") {
                     val guildId = guildId ?: return@command
-                    val permissions =
-                        computePermissions(author, channel.get(), clientStore)
-                    if (!permissions.contains(Permission.ADMINISTRATOR)) {
+                    val roles =
+                        clientStore.guilds[guildId].getMember(authorId).roleIds
+                    if (config.excoRole !in roles) {
                         reply("You are not authorized")
                         return@command
                     }

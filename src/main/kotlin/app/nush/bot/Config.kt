@@ -9,7 +9,8 @@ data class Config(
     val projectsCategoryId: String,
     val botPrefix: String = "!",
     val guildId: String,
-    val memberRole: String
+    val memberRole: String,
+    val excoRole: String
 ) {
     companion object {
         val config =
