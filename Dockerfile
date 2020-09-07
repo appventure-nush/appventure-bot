@@ -2,7 +2,6 @@ FROM openjdk:8-alpine
 
 RUN apk add openssl
 RUN adduser -S bot
-COPY --chown=bot:root index.html /var/www/localhost/
 
 USER bot
 RUN mkdir /home/bot/bot
