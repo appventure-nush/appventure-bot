@@ -4,9 +4,12 @@ package app.nush.bot
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.commands.Projects
 import app.nush.bot.commands.Verify
+import app.nush.bot.server.startServer
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
@@ -23,10 +26,13 @@ val helpText = """
 """.trimIndent()
 
 const val url =
-    "http://login.microsoftonline.com/d72a7172-d5f8-4889-9a85-d7424751592a/oauth2/authorize?client_id=9f1a352a-8217-4a32-a4d3-d3c06d7b8581&redirect_uri=https://verify.nush.app/&response_type=id_token&nonce="
+    "http://login.microsoftonline.com/d72a7172-d5f8-4889-9a85-d7424751592a/oauth2/authorize?client_id=9f1a352a-8217-4a32-a4d3-d3c06d7b8581&redirect_uri=https://verify.nush.app/&response_type=id_token&response_mode=form_post&nonce="
 @ExperimentalStdlibApi
 @UnstableDefault
 suspend fun main() {
+    GlobalScope.launch {
+        startServer()
+    }
     bot(config.discordToken) {
         commands(config.botPrefix) {
             command("help") {
