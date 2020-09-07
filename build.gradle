@@ -23,8 +23,9 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
-    implementation "com.jessecorbett:diskord:1.7.1"
+    implementation "com.jessecorbett:diskord:1.7.3"
     implementation "com.junron.pyrobase:ms-auth:1.0"
     implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "com.junron.pyrobase:json-cache:1.2"
 }
 mainClassName = "app.nush.bot.MainKt"

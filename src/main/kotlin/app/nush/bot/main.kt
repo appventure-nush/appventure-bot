@@ -4,15 +4,10 @@ package app.nush.bot
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.commands.Projects
 import app.nush.bot.commands.Verify
-import com.jessecorbett.diskord.api.rest.CreateDM
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
-import com.jessecorbett.diskord.dsl.embed
-import com.jessecorbett.diskord.util.Colors
-import com.jessecorbett.diskord.util.sendMessage
 import kotlinx.serialization.UnstableDefault
-import java.lang.Math.random
 
 val helpText = """
     **Commands**

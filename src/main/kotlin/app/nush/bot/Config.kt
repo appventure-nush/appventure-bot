@@ -10,10 +10,15 @@ data class Config(
     val botPrefix: String = "!",
     val guildId: String,
     val memberRole: String,
-    val excoRole: String
+    val excoRole: String,
+    val dev: Boolean = true
 ) {
     companion object {
-        val config =
+
+        private val _config =
             Json.parse(serializer(), File("config.json").readText())
+        val config =
+            _config.copy(botPrefix = if (_config.dev) "dev" + _config.botPrefix else _config.botPrefix)
+
     }
 }

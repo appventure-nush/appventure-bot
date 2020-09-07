@@ -18,7 +18,7 @@ object Projects : Command {
                     val guildId = guildId ?: return@command
                     val roles =
                         clientStore.guilds[guildId].getMember(authorId).roleIds
-                    if (config.excoRole !in roles) {
+                    if (config.excoRole !in roles && !config.dev) {
                         reply("You are not authorized")
                         return@command
                     }
