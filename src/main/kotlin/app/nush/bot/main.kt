@@ -33,6 +33,7 @@ suspend fun main() {
     GlobalScope.launch {
         startServer()
     }
+    println("Hello world!")
     bot(config.discordToken) {
         commands(config.botPrefix) {
             command("help") {
