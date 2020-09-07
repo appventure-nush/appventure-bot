@@ -1,0 +1,26 @@
+version: 2
+
+networks:
+  primary:
+    external:
+      name: primary
+
+services:
+  bot:
+    image: registry.nush.app/appventure-bot:latest
+    restart: always
+    expose:
+      - "3000"
+    environment:
+      - PASS=<redacted>
+    command: sh -c "openssl aes-256-cbc -d -a -pbkdf2 -in config.json.enc -out config.json -pass env:PASS && java -jar bot.jar"
+    networks:
+      - primary
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.verify.rule=Host(`verify.nush.app`)"
+      - "traefik.http.routers.verify.entrypoints=https"
+      - "traefik.http.routers.verify.tls=true"
+      - "traefik.http.routers.verify.tls.certresolver=tlsresolver"
+
+
