@@ -94,7 +94,7 @@ object Projects : Command {
                     val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
                     val org = github.getOrganization("appventure-nush")
                     val repo = org.createRepository(projName).create()
-//                    val repo = org.getRepository("appventure-bot")
+//                    val repo = org.getRepository("appventure-bot") // use this for testing
                     val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
                             "/" + discordWebhook.token + "/github"
                     repo.createHook(
