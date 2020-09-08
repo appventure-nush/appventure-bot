@@ -45,14 +45,14 @@ object Projects : Command {
                             mentionable = false
                         )
                     )
-//                    val denyAll = Overwrite(
-//                        guildId,
-//                        OverwriteType.ROLE,
-//                        Permissions.NONE,
-//                        Permissions.ALL
-//                    )
+                    val denyAll = Overwrite(
+                        guildId,
+                        OverwriteType.ROLE,
+                        Permissions.NONE,
+                        Permissions.ALL
+                    )
                     val overwrites = listOf(
-//                        denyAll,
+                        denyAll,
                         Overwrite(
                             role.id, OverwriteType.ROLE,
                             Permissions.of(
@@ -67,7 +67,7 @@ object Projects : Command {
                         )
                     )
                     val overwritesVoice = listOf(
-//                        denyAll,
+                        denyAll,
                         Overwrite(
                             role.id, OverwriteType.ROLE, Permissions.of(
                                 Permission.CONNECT,
