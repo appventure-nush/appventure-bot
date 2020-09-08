@@ -10,6 +10,8 @@ import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import com.jessecorbett.diskord.api.rest.CreateWebhook
+import org.kohsuke.github.*
+import java.net.URL
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -87,7 +89,20 @@ object Projects : Command {
                             permissionOverwrites = overwrites
                         )
                     )
-                    bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
+                    val discordWebhook = bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
+
+                    val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
+                    val org = github.getOrganization("appventure-nush")
+                    val repo = org.createRepository(projName).create()
+//                    val repo = org.getRepository("appventure-bot")
+                    val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
+                    "/" + discordWebhook.token + "/github"
+                    repo.createHook("web",
+                        mapOf( "url" to
+                                urlstr, "content_type" to "json", "insecure_ssl" to "0"),
+                        listOf(GHEvent.PUSH),
+                        true
+                    )
 
                     val vc = guild.createChannel(
                         CreateChannel(

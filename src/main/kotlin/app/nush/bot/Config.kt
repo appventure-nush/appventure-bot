@@ -11,6 +11,7 @@ data class Config(
     val guildId: String,
     val memberRole: String,
     val excoRole: String,
+    val githubToken: String,
     val dev: Boolean = true
 ) {
     companion object {
