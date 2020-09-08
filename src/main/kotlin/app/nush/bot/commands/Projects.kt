@@ -9,6 +9,7 @@ import com.jessecorbett.diskord.dsl.CommandSet
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
+import com.jessecorbett.diskord.api.rest.CreateWebhook
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -42,14 +43,14 @@ object Projects : Command {
                             mentionable = false
                         )
                     )
-                    val denyAll = Overwrite(
-                        guildId,
-                        OverwriteType.ROLE,
-                        Permissions.NONE,
-                        Permissions.ALL
-                    )
+//                    val denyAll = Overwrite(
+//                        guildId,
+//                        OverwriteType.ROLE,
+//                        Permissions.NONE,
+//                        Permissions.ALL
+//                    )
                     val overwrites = listOf(
-                        denyAll,
+//                        denyAll,
                         Overwrite(
                             role.id, OverwriteType.ROLE,
                             Permissions.of(
@@ -64,7 +65,7 @@ object Projects : Command {
                         )
                     )
                     val overwritesVoice = listOf(
-                        denyAll,
+//                        denyAll,
                         Overwrite(
                             role.id, OverwriteType.ROLE, Permissions.of(
                                 Permission.CONNECT,
@@ -86,6 +87,8 @@ object Projects : Command {
                             permissionOverwrites = overwrites
                         )
                     )
+                    bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
+
                     val vc = guild.createChannel(
                         CreateChannel(
                             "$projName-voice",
