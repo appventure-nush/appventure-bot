@@ -89,6 +89,7 @@ object Projects : Command {
                             permissionOverwrites = overwrites
                         )
                     )
+                    reply("Channel <#${channel.id}> created")
                     val discordWebhook = bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
 
                     val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
@@ -121,7 +122,6 @@ object Projects : Command {
                             permissionOverwrites = overwritesVoice
                         )
                     )
-                    reply("Channel <#${channel.id}> created")
                 }
             }
         }
