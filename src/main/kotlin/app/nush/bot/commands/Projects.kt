@@ -122,6 +122,37 @@ object Projects : Command {
                         )
                     )
                 }
+                command("linkrepo") {
+                    val guildId = guildId ?: return@command
+                    val roles =
+                        clientStore.guilds[guildId].getMember(authorId).roleIds
+                    if (config.excoRole !in roles && !config.dev) {
+                        reply("You are not authorized")
+                        return@command
+                    }
+                    if (words.size < 3) {
+                        reply("Please specify a project name")
+                        return@command
+                    }
+                    val projname = words[2]
+                    val discordWebhook = bot.clientStore.channels[channelId].createWebhook(CreateWebhook("For GitHub"))
+                    val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
+                    val org = github.getOrganization("appventure-nush")
+                    val repo = org.getRepository(projname)
+                    val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
+                            "/" + discordWebhook.token + "/github"
+                    repo.createHook(
+                        "web",
+                        mapOf(
+                            "url" to
+                                    urlstr, "content_type" to "json", "insecure_ssl" to "0"
+                        ),
+                        listOf(GHEvent.PUSH),
+                        true
+                    )
+
+                    reply("Successfully linked ${channel.get().name} with $projname")
+                }
             }
         }
     }
