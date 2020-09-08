@@ -96,13 +96,18 @@ object Projects : Command {
                     val repo = org.createRepository(projName).create()
 //                    val repo = org.getRepository("appventure-bot")
                     val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
-                    "/" + discordWebhook.token + "/github"
-                    repo.createHook("web",
-                        mapOf( "url" to
-                                urlstr, "content_type" to "json", "insecure_ssl" to "0"),
+                            "/" + discordWebhook.token + "/github"
+                    repo.createHook(
+                        "web",
+                        mapOf(
+                            "url" to
+                                    urlstr, "content_type" to "json", "insecure_ssl" to "0"
+                        ),
                         listOf(GHEvent.PUSH),
                         true
                     )
+                    reply("GitHub repository $projName created")
+                    reply("Link: https://github.com/appventure-nush/$projName")
 
                     val vc = guild.createChannel(
                         CreateChannel(
