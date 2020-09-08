@@ -11,6 +11,7 @@ import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import com.jessecorbett.diskord.api.rest.CreateWebhook
 import org.kohsuke.github.*
+import java.io.IOException
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -89,26 +90,28 @@ object Projects : Command {
                         )
                     )
                     reply("Channel <#${channel.id}> created")
-                    val discordWebhook = bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
 
-                    val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
-                    val org = github.getOrganization("appventure-nush")
-                    val repo = org.createRepository(projName).create()
+                    if (!(words[3] != null && words[3].equals("ownrepo"))) {
+                        val discordWebhook =
+                            bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
+                        val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
+                        val org = github.getOrganization("appventure-nush")
+                        val repo = org.createRepository(projName).create()
 //                    val repo = org.getRepository("appventure-bot") // use this for testing
-                    val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
-                            "/" + discordWebhook.token + "/github"
-                    repo.createHook(
-                        "web",
-                        mapOf(
-                            "url" to
-                                    urlstr, "content_type" to "json", "insecure_ssl" to "0"
-                        ),
-                        listOf(GHEvent.PUSH),
-                        true
-                    )
-                    reply("GitHub repository $projName created")
-                    reply("Link: https://github.com/appventure-nush/$projName")
-
+                        val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
+                                "/" + discordWebhook.token + "/github"
+                        repo.createHook(
+                            "web",
+                            mapOf(
+                                "url" to
+                                        urlstr, "content_type" to "json", "insecure_ssl" to "0"
+                            ),
+                            listOf(GHEvent.PUSH),
+                            true
+                        )
+                        reply("GitHub repository $projName created")
+                        reply("Link: https://github.com/appventure-nush/$projName")
+                    }
                     val vc = guild.createChannel(
                         CreateChannel(
                             "$projName-voice",
@@ -138,20 +141,26 @@ object Projects : Command {
                     val discordWebhook = bot.clientStore.channels[channelId].createWebhook(CreateWebhook("For GitHub"))
                     val github = GitHubBuilder().withOAuthToken(config.githubToken).build()
                     val org = github.getOrganization("appventure-nush")
-                    val repo = org.getRepository(projname)
-                    val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
-                            "/" + discordWebhook.token + "/github"
-                    repo.createHook(
-                        "web",
-                        mapOf(
-                            "url" to
-                                    urlstr, "content_type" to "json", "insecure_ssl" to "0"
-                        ),
-                        listOf(GHEvent.PUSH),
-                        true
-                    )
+                    try {
+                        val repo = org.getRepository(projname)
+                        val urlstr = "https://discordapp.com/api/webhooks/" + discordWebhook.id +
+                                "/" + discordWebhook.token + "/github"
+                        repo.createHook(
+                            "web",
+                            mapOf(
+                                "url" to
+                                        urlstr, "content_type" to "json", "insecure_ssl" to "0"
+                            ),
+                            listOf(GHEvent.PUSH),
+                            true
+                        )
 
-                    reply("Successfully linked ${channel.get().name} with $projname")
+                        reply("Successfully linked ${channel.get().name} with $projname")
+                    } catch (e: IOException) {
+                        reply("Repository not found")
+                        return@command
+                    }
+
                 }
             }
         }
