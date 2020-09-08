@@ -11,7 +11,6 @@ import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import com.jessecorbett.diskord.api.rest.CreateWebhook
 import org.kohsuke.github.*
-import java.net.URL
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
