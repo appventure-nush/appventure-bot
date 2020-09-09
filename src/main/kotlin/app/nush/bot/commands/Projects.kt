@@ -128,7 +128,7 @@ object Projects : Command {
                     val discordWebhook = bot.clientStore.channels[channelId].createWebhook(CreateWebhook("For GitHub"))
                     try {
                         createWH(projName, discordWebhook.id, discordWebhook.token)
-                        reply("Successfully linked ${channel.get().name} with $projName")
+                        reply("Successfully linked #${channel.get().name} with $projName")
                     } catch (e: IOException) {
                         reply("Repository not found")
                         return@command
