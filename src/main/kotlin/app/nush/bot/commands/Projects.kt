@@ -24,15 +24,18 @@ object Projects : Command {
                         reply("You are not authorized")
                         return@command
                     }
-                    if (words.size < 3) {
+                    var cutWords = words
+                    var channelOnly = false
+                    if (words.last() == "channel-only") {
+                        cutWords = words.drop(1)
+                        channelOnly = true
+                    }
+                    if (cutWords.size < 3) {
                         reply("Please specify a project name")
                         return@command
                     }
-                    var cutWords = words
-                    if (words.last() == "channel-only")
-                        cutWords = words.drop(1)
                     val projName =
-                        cutWords.slice(2..words.lastIndex).joinToString("-")
+                        cutWords.slice(2..cutWords.lastIndex).joinToString("-")
                             .toLowerCase().trim()
                     val guild = bot.clientStore.guilds[guildId]
                     if (guild.getRoles().any { it.name == projName }) {
@@ -108,7 +111,7 @@ object Projects : Command {
                     )
                     reply("Channel <#${channel.id}> created")
 
-                    if (!(words.size == 4 && words[3] == "channel-only")) {
+                    if (!channelOnly) {
                         val discordWebhook =
                             bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
                         createWH(projName, discordWebhook.id, discordWebhook.token, true)
