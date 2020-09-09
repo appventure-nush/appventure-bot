@@ -14,7 +14,8 @@ data class Config(
     val dev: Boolean = true,
     var userIsAppVentureMember: Boolean = false,
     val alumniRole: String,
-    val guestRole: String
+    val guestRole: String,
+    val excoChannelId: String
 ) {
     companion object {
 
