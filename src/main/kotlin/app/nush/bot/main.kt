@@ -20,11 +20,11 @@ val helpText = """
     **`${config.botPrefix}help`**
     Displays this message
     
-    **`${config.botPrefix}projects create`**
+    **`${config.botPrefix}projects create <repo name> [channel-only]`**
     Creates new project (admin only)
     Append "channel-only" if repo already exists
     
-    **`${config.botPrefix}projects linkrepo`**
+    **`${config.botPrefix}projects linkrepo <repo name>`**
     Links current channel to existing project (admin only)
     
 """.trimIndent()
