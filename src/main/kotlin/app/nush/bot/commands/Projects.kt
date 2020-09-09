@@ -11,7 +11,6 @@ import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import com.jessecorbett.diskord.api.rest.CreateWebhook
 import org.kohsuke.github.*
-import java.io.IOException
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -29,8 +28,11 @@ object Projects : Command {
                         reply("Please specify a project name")
                         return@command
                     }
+                    var cutWords = words
+                    if (words.last() == "channel-only")
+                        cutWords = words.drop(1)
                     val projName =
-                        words.slice(2..words.lastIndex).joinToString("-")
+                        cutWords.slice(2..words.lastIndex).joinToString("-")
                             .toLowerCase().trim()
                     val guild = bot.clientStore.guilds[guildId]
                     if (guild.getRoles().any { it.name == projName }) {
@@ -106,7 +108,7 @@ object Projects : Command {
                     )
                     reply("Channel <#${channel.id}> created")
 
-                    if (!(words.size == 4 && words[3].equals("channel-only"))) {
+                    if (!(words.size == 4 && words[3] == "channel-only")) {
                         val discordWebhook =
                             bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
                         createWH(projName, discordWebhook.id, discordWebhook.token, true)
