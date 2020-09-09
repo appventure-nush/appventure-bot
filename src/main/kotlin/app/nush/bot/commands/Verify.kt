@@ -1,6 +1,7 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.commands.Member.Companion.members
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingRequests
 import app.nush.bot.url
@@ -60,18 +61,28 @@ object Verify : Command {
     suspend fun userVerified(user: User, discordUserId: String) {
         val name = user.name.toLowerCase().capitalizeWords()
         with(bot) {
+            var userIsAppVenture = false
             val channel = clientStore.discord.createDM(CreateDM(discordUserId))
             val guildClient = clientStore.guilds[config.guildId]
-            guildClient.addMemberRole(
-                discordUserId,
-                config.memberRole
-            )
+            val channelClient = clientStore.channels["738913820021358672"]
+            for (member in members) {
+                if (member.Email == user.email) {
+                    userIsAppVenture = true
+                    guildClient.addMemberRole(
+                        discordUserId,
+                        config.memberRole
+                    )
+                }
+            }
+            if (!userIsAppVenture) {
+                channelClient.sendMessage("$name($discordUserId) is requesting to join the server!")
+            } else {
+                clientStore.channels[channel.id].sendMessage("Welcome, $name")
+            }
             guildClient.changeNickname(
                 discordUserId,
                 name
             )
-            clientStore.channels[channel.id].sendMessage("Welcome, $name")
         }
     }
-
 }
