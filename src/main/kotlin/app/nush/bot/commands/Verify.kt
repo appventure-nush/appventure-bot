@@ -25,7 +25,7 @@ object Verify : Command {
         this.bot = bot
         with(prefix) {
             command("sendverify") {
-                sendVerifyMessage(bot, authorId)
+            userVerified(User("Su Zhengchong", "h1810141@nushigh.edu.sg", 0), authorId)
             }
         }
     }
@@ -61,21 +61,20 @@ object Verify : Command {
     suspend fun userVerified(user: User, discordUserId: String) {
         val name = user.name.toLowerCase().capitalizeWords()
         with(bot) {
-            var userIsAppVenture = false
+            config.userIsAppVentureMember = false
             val channel = clientStore.discord.createDM(CreateDM(discordUserId))
             val guildClient = clientStore.guilds[config.guildId]
             val channelClient = clientStore.channels["738913820021358672"]
-            for (member in members) {
-                if (member.Email == user.email) {
-                    userIsAppVenture = true
-                    guildClient.addMemberRole(
-                        discordUserId,
-                        config.memberRole
-                    )
-                }
+            val isMember: (Member) -> Boolean = { it.email == user.email }
+            if (members.any { isMember(it) }) {
+                config.userIsAppVentureMember = true
+                guildClient.addMemberRole(
+                    discordUserId,
+                    config.memberRole
+                )
             }
-            if (!userIsAppVenture) {
-                channelClient.sendMessage("$name($discordUserId) is requesting to join the server!")
+            if (!config.userIsAppVentureMember) {
+                channelClient.sendMessage("$name(<@!$discordUserId>) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server")
             } else {
                 clientStore.channels[channel.id].sendMessage("Welcome, $name")
             }
@@ -83,6 +82,47 @@ object Verify : Command {
                 discordUserId,
                 name
             )
+            reactionAdded { messageReaction ->
+                try {
+                    if (messageReaction.emoji.name == "mortar_board") {
+                        clientStore.channels[clientStore.discord.createDM(
+                            CreateDM(
+                                channelClient.getMessage(
+                                    messageReaction.messageId
+                                ).usersMentioned[0].id
+                            )
+                        ).id].sendMessage("An exco has allowed your access to the AppVenture server as an alumni.")
+                        guildClient.addMemberRole(
+                            channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id,
+                            config.alumniRole
+                        )
+                    } else if (messageReaction.emoji.name == "negative_squared_cross_mark") {
+                        clientStore.channels[clientStore.discord.createDM(
+                            CreateDM(
+                                channelClient.getMessage(
+                                    messageReaction.messageId
+                                ).usersMentioned[0].id
+                            )
+                        ).id].sendMessage("You were kicked from the AppVenture server because an exco denied your access.")
+                        guildClient.removeMember(channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id)
+                    } else if (messageReaction.emoji.name == "white_check_mark") {
+                        clientStore.channels[clientStore.discord.createDM(
+                            CreateDM(
+                                channelClient.getMessage(
+                                    messageReaction.messageId
+                                ).usersMentioned[0].id
+                            )
+                        ).id].sendMessage("An exco has allowed your access to the AppVenture server as a guest.")
+                        guildClient.addMemberRole(
+                            channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id,
+                            config.guestRole
+                        )
+                    } else {
+                        println(messageReaction.emoji.name)
+                    }
+                } catch (e: Exception) {
+                }
+            }
         }
     }
 }

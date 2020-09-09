@@ -6,7 +6,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 @Serializable
-data class Member(val ID: String, val Email: String, val Name: String, val MentorGroup: String) {
+data class Member(val id: String, val email: String, val name: String, val mentorGroup: String) {
     companion object {
         val members: List<Member> = Json.parse(serializer().list, File("data/members.json").readText())
     }
