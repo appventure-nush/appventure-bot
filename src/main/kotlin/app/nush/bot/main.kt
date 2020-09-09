@@ -22,7 +22,7 @@ val helpText = """
     
     **`${config.botPrefix}projects create`**
     Creates new project (admin only)
-    Append "ownrepo" if repo already exists
+    Append "channel-only" if repo already exists
     
     **`${config.botPrefix}projects linkrepo`**
     Links current channel to existing project (admin only)
