@@ -20,7 +20,7 @@ val helpText = """
     **`${config.botPrefix}help`**
     Displays this message
     
-    **`${config.botPrefix}projects create`**
+    **`${config.botPrefix}projects create <project name>`**
     Creates new project (admin only)
     
 """.trimIndent()

@@ -42,6 +42,8 @@ object Projects : Command {
                             mentionable = false
                         )
                     )
+                    // @everyone role has same id as guildId
+                    // https://discord.com/developers/docs/topics/permissions#role-object
                     val denyAll = Overwrite(
                         guildId,
                         OverwriteType.ROLE,
