@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
+    **Bot version**: 1.2
     **Commands**
     **`${config.botPrefix}ping`**
     Check if server is alive

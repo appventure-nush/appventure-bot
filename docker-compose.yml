@@ -22,5 +22,5 @@ services:
       - "traefik.http.routers.verify.entrypoints=https"
       - "traefik.http.routers.verify.tls=true"
       - "traefik.http.routers.verify.tls.certresolver=tlsresolver"
-
-
+    volumes:
+      - /data/appventure-bot/data:/home/bot/bot/data:z
