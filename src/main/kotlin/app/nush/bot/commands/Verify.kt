@@ -25,7 +25,7 @@ object Verify : Command {
         this.bot = bot
         with(prefix) {
             command("sendverify") {
-            userVerified(User("Su Zhengchong", "h1810141@nushigh.edu.sg", 0), authorId)
+                sendVerifyMessage(bot, authorId)
             }
         }
     }
@@ -74,6 +74,11 @@ object Verify : Command {
                 )
             }
             if (!config.userIsAppVentureMember) {
+                clientStore.channels[clientStore.discord.createDM(
+                    CreateDM(
+                        discordUserId
+                    )
+                ).id].sendMessage("As you are not a present appventure member, your join request has been forwarded to the exco")
                 val accessMessage =
                     channelClient.sendMessage("$name(<@!$discordUserId>) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server")
                 accessMessage.react("\uD83C\uDF93")
@@ -88,7 +93,7 @@ object Verify : Command {
             )
             reactionAdded { messageReaction ->
                 try {
-                    if (!guildClient.getMember(messageReaction.userId).user?.isBot!!)
+                    if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
                         if (messageReaction.emoji.name == "\uD83C\uDF93") {
                             clientStore.channels[clientStore.discord.createDM(
                                 CreateDM(
@@ -147,6 +152,7 @@ object Verify : Command {
                             )
                             channelClient.getMessage(messageReaction.messageId).delete()
                         }
+                    }
                 } catch (e: Exception) {
                 }
             }

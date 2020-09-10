@@ -2,6 +2,7 @@ package app.nush.bot
 
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.commands.Nick
 import app.nush.bot.commands.Projects
 import app.nush.bot.commands.Verify
 import app.nush.bot.server.startServer
@@ -20,9 +21,11 @@ val helpText = """
     **`${config.botPrefix}help`**
     Displays this message
     
-    **`${config.botPrefix}projects create`**
-    Creates new project (admin only)
+    **`${config.botPrefix}sendverify`**
+    Dms you the verification message
     
+    **`${config.botPrefix}nick`**
+    Sends a rename request to the exco
 """.trimIndent()
 
 const val url =
@@ -42,6 +45,7 @@ suspend fun main() {
                 reply("pong")
             }
             Verify.init(this@bot, this)
+            Nick.init(this@bot, this)
         }
         commands("${config.botPrefix}projects ") {
             Projects.init(this@bot, this)
