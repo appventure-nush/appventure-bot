@@ -19,7 +19,7 @@ object Nick : Command {
                 request(
                     bot,
                     authorId,
-                    words.subList(1.coerceAtMost(words.size - 1), words.size - 1).joinToString(separator = " ")
+                    words.drop(1).joinToString(separator = " ")
                 )
             }
         }
