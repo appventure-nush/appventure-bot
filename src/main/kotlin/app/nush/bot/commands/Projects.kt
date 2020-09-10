@@ -4,11 +4,14 @@ import app.nush.bot.Config.Companion.config
 import com.jessecorbett.diskord.api.model.*
 import com.jessecorbett.diskord.api.rest.CreateChannel
 import com.jessecorbett.diskord.api.rest.CreateGuildRole
+import com.jessecorbett.diskord.api.rest.CreateWebhook
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
+import org.kohsuke.github.GHEvent
+import org.kohsuke.github.GitHubBuilder
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -22,12 +25,14 @@ object Projects : Command {
                         reply("You are not authorized")
                         return@command
                     }
-                    if (words.size < 3) {
+                    val channelOnly = words.last() == "channel-only"
+                    val cutWords = words.filter { it != "channel-only" }
+                    if (cutWords.size < 3) {
                         reply("Please specify a project name")
                         return@command
                     }
                     val projName =
-                        words.slice(2..words.lastIndex).joinToString("-")
+                        cutWords.slice(2..cutWords.lastIndex).joinToString("-")
                             .toLowerCase().trim()
                     val guild = bot.clientStore.guilds[guildId]
                     if (guild.getRoles().any { it.name == projName }) {
@@ -88,6 +93,7 @@ object Projects : Command {
                             permissionOverwrites = overwrites
                         )
                     )
+
                     val vc = guild.createChannel(
                         CreateChannel(
                             "$projName-voice",
@@ -101,9 +107,62 @@ object Projects : Command {
                         )
                     )
                     reply("Channel <#${channel.id}> created")
+
+                    if (!channelOnly) {
+                        val discordWebhook =
+                            bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
+                        createWH(projName, discordWebhook.id, discordWebhook.token, true)
+                        reply("GitHub repository $projName created")
+                        reply("Link: https://github.com/appventure-nush/$projName")
+                    }
+                }
+                command("linkrepo") {
+                    val guildId = guildId ?: return@command
+                    val roles =
+                        clientStore.guilds[guildId].getMember(authorId).roleIds
+                    if (config.excoRole !in roles && !config.dev) {
+                        reply("You are not authorized")
+                        return@command
+                    }
+                    if (words.size < 3) {
+                        reply("Please specify a project name")
+                        return@command
+                    }
+                    val projName = words[2]
+                    val discordWebhook = bot.clientStore.channels[channelId].createWebhook(CreateWebhook("For GitHub"))
+
+                    if (createWH(projName, discordWebhook.id, discordWebhook.token, false))
+                        reply("Successfully linked <#${channelId}> with $projName")
+                    else
+                        reply("Repository does not exist")
                 }
             }
         }
     }
 
+    private fun createWH(projName: String, id: String, token: String, newRepo: Boolean): Boolean {
+        val org = GitHubBuilder().withOAuthToken(config.githubToken).build()
+            .getOrganization("appventure-nush")
+        val repo = if (newRepo)
+            org.createRepository(projName).create()
+        else
+            org.getRepository(projName) ?: return false
+        val urlstr = "https://discordapp.com/api/webhooks/" + id +
+                "/" + token + "/github"
+        repo.createHook(
+            "web",
+            mapOf(
+                "url" to
+                        urlstr, "content_type" to "json", "insecure_ssl" to "0"
+            ),
+            listOf(
+                GHEvent.PUSH,
+                GHEvent.PULL_REQUEST,
+                GHEvent.PULL_REQUEST_REVIEW,
+                GHEvent.PULL_REQUEST_REVIEW_COMMENT
+            ),
+            true
+        )
+        return true
+    }
 }

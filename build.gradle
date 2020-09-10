@@ -27,6 +27,7 @@ dependencies {
     implementation "com.junron.pyrobase:ms-auth:1.0"
     implementation "ch.qos.logback:logback-classic:1.2.3"
     implementation "com.junron.pyrobase:json-cache:1.2"
+    implementation "org.kohsuke:github-api:1.116"
     implementation "io.ktor:ktor-server-core:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
 }
