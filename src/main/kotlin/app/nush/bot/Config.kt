@@ -12,10 +12,13 @@ data class Config(
     val memberRole: String,
     val excoRole: String,
     val dev: Boolean = true,
-    var userIsAppVentureMember: Boolean = false,
     val alumniRole: String,
     val guestRole: String,
-    val excoChannelId: String
+    val excoChannelId: String,
+    val botId: String,
+    val hatEmote: String,
+    val cross: String,
+    val tick: String
 ) {
     companion object {
 
