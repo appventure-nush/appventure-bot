@@ -1,6 +1,7 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.botId
 import app.nush.bot.commands.Member.Companion.members
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingRequests
@@ -37,13 +38,20 @@ object Verify : Command {
                     val guildClient = clientStore.guilds[config.guildId]
                     val channelClient = clientStore.channels[config.excoChannelId]
                     if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
-                        val accessRequestMessage = channelClient.getMessage(messageReaction.messageId)
-                        if (accessRequestMessage.content.substring(accessRequestMessage.content.length - 230) != ">) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server") {
+                        val accessRequestMessage =
+                            channelClient.getMessage(messageReaction.messageId)
+                        if (accessRequestMessage.content.substring(
+                                accessRequestMessage.content.length - 230
+                            ) != ">) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server"
+                        ) {
                             return@reactionAdded
                         }
-                        if (accessRequestMessage.authorId == config.botId) {
-                            if (messageReaction.emoji.name == config.hatEmote) {
-                                clientStore.channels[clientStore.discord.createDM(CreateDM(accessRequestMessage.usersMentioned[0].id)).id].sendMessage(
+                        if (accessRequestMessage.authorId != botId) return@reactionAdded
+                        when (messageReaction.emoji.name) {
+                            config.hatEmote -> {
+                                clientStore.channels[clientStore.discord.createDM(
+                                    CreateDM(accessRequestMessage.usersMentioned[0].id)
+                                ).id].sendMessage(
                                     "An exco has allowed your access to the AppVenture server as an alumni."
                                 )
                                 channelClient.sendMessage(
@@ -58,7 +66,8 @@ object Verify : Command {
                                     config.alumniRole
                                 )
                                 accessRequestMessage.delete()
-                            } else if (messageReaction.emoji.name == config.cross) {
+                            }
+                            config.cross -> {
                                 clientStore.channels[clientStore.discord.createDM(
                                     CreateDM(
                                         accessRequestMessage.usersMentioned[0].id
@@ -73,7 +82,8 @@ object Verify : Command {
                                 )
                                 guildClient.removeMember(accessRequestMessage.usersMentioned[0].id)
                                 accessRequestMessage.delete()
-                            } else if (messageReaction.emoji.name == config.tick) {
+                            }
+                            config.tick -> {
                                 clientStore.channels[clientStore.discord.createDM(
                                     CreateDM(
                                         accessRequestMessage.usersMentioned[0].id
@@ -93,7 +103,7 @@ object Verify : Command {
                                 accessRequestMessage.delete()
                             }
                         }
-                    }
+                        }
                 } catch (e: Exception) {
                     return@reactionAdded
                 }

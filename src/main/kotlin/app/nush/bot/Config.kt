@@ -15,7 +15,6 @@ data class Config(
     val alumniRole: String,
     val guestRole: String,
     val excoChannelId: String,
-    val botId: String,
     val hatEmote: String,
     val cross: String,
     val tick: String
