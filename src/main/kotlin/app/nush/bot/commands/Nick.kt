@@ -1,6 +1,7 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.botId
 import com.jessecorbett.diskord.api.rest.CreateDM
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
@@ -33,7 +34,9 @@ object Nick : Command {
         with(bot) {
             reactionAdded { messageReaction ->
                 try {
-                    if (messageReaction.emoji.name != config.cross && messageReaction.emoji.name != config.tick) {
+                    val tick = "✅"
+                    val cross = "❎"
+                    if (messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
                         return@reactionAdded
                     }
                     val guildClient = clientStore.guilds[config.guildId]
@@ -43,9 +46,7 @@ object Nick : Command {
                         if (nickRequestMessage.content.substring(nickRequestMessage.content.length - 96) != "\". ✅ if you want to accept the rename request, ❎ if you do not want to accept the rename request") {
                             return@reactionAdded
                         }
-                        if (nickRequestMessage.authorId != config.botId) {
-                            return@reactionAdded
-                        }
+                        if (nickRequestMessage.authorId != botId) return@reactionAdded
                         val newName: String = nickRequestMessage.content.subSequence(
                             nickRequestMessage.content.indexOf("\"") + 1,
                             nickRequestMessage.content.indexOf(
@@ -53,7 +54,7 @@ object Nick : Command {
                                 nickRequestMessage.content.indexOf("\"") + 1
                             )
                         ).toString()
-                        if (messageReaction.emoji.name == config.cross) {
+                        if (messageReaction.emoji.name == cross) {
                             clientStore.channels[clientStore.discord.createDM(
                                 CreateDM(
                                     nickRequestMessage.usersMentioned[0].id
@@ -67,7 +68,7 @@ object Nick : Command {
                                 }(<@!${nickRequestMessage.usersMentioned[0].id}>)'s request to change name to \"$newName\""
                             )
                             nickRequestMessage.delete()
-                        } else if (messageReaction.emoji.name == config.tick) {
+                        } else if (messageReaction.emoji.name == tick) {
                             clientStore.channels[clientStore.discord.createDM(
                                 CreateDM(
                                     nickRequestMessage.usersMentioned[0].id

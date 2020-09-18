@@ -14,10 +14,7 @@ data class Config(
     val dev: Boolean = true,
     val alumniRole: String,
     val guestRole: String,
-    val excoChannelId: String,
-    val hatEmote: String,
-    val cross: String,
-    val tick: String
+    val excoChannelId: String
 ) {
     companion object {
 

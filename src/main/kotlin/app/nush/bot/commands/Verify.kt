@@ -32,7 +32,10 @@ object Verify : Command {
         with(bot) {
             reactionAdded { messageReaction ->
                 try {
-                    if (messageReaction.emoji.name != config.hatEmote && messageReaction.emoji.name != config.cross && messageReaction.emoji.name != config.tick) {
+                    val tick = "✅"
+                    val cross = "❎"
+                    val hatEmote = "\uD83C\uDF93"
+                    if (messageReaction.emoji.name != hatEmote && messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
                         return@reactionAdded
                     }
                     val guildClient = clientStore.guilds[config.guildId]
@@ -40,15 +43,12 @@ object Verify : Command {
                     if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
                         val accessRequestMessage =
                             channelClient.getMessage(messageReaction.messageId)
-                        if (accessRequestMessage.content.substring(
-                                accessRequestMessage.content.length - 230
-                            ) != ">) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server"
-                        ) {
+                        if (accessRequestMessage.content.substring(accessRequestMessage.content.length - 230) != ">) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server") {
                             return@reactionAdded
                         }
                         if (accessRequestMessage.authorId != botId) return@reactionAdded
                         when (messageReaction.emoji.name) {
-                            config.hatEmote -> {
+                            hatEmote -> {
                                 clientStore.channels[clientStore.discord.createDM(
                                     CreateDM(accessRequestMessage.usersMentioned[0].id)
                                 ).id].sendMessage(
@@ -67,7 +67,7 @@ object Verify : Command {
                                 )
                                 accessRequestMessage.delete()
                             }
-                            config.cross -> {
+                            cross -> {
                                 clientStore.channels[clientStore.discord.createDM(
                                     CreateDM(
                                         accessRequestMessage.usersMentioned[0].id
@@ -83,7 +83,7 @@ object Verify : Command {
                                 guildClient.removeMember(accessRequestMessage.usersMentioned[0].id)
                                 accessRequestMessage.delete()
                             }
-                            config.tick -> {
+                            tick -> {
                                 clientStore.channels[clientStore.discord.createDM(
                                     CreateDM(
                                         accessRequestMessage.usersMentioned[0].id
