@@ -16,11 +16,79 @@ object Nick : Command {
         this.bot = bot
         with(prefix) {
             command("nick") {
-                request(
-                    bot,
-                    authorId,
-                    words.drop(1).joinToString(separator = " ")
-                )
+                val newName: String = words.drop(1).joinToString(separator = " ")
+                if (newName != "") {
+                    request(
+                        bot,
+                        authorId,
+                        newName
+                    )
+                } else {
+                    with(bot) {
+                        clientStore.channels[this@command.id].sendMessage("You may not request an empty nickname!")
+                    }
+                }
+            }
+        }
+        with(bot) {
+            reactionAdded { messageReaction ->
+                try {
+                    if (messageReaction.emoji.name != config.cross && messageReaction.emoji.name != config.tick) {
+                        return@reactionAdded
+                    }
+                    val guildClient = clientStore.guilds[config.guildId]
+                    val channelClient = clientStore.channels[config.excoChannelId]
+                    if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
+                        val nickRequestMessage = channelClient.getMessage(messageReaction.messageId)
+                        if (nickRequestMessage.content.substring(nickRequestMessage.content.length - 96) != "\". ✅ if you want to accept the rename request, ❎ if you do not want to accept the rename request") {
+                            return@reactionAdded
+                        }
+                        if (nickRequestMessage.authorId != config.botId) {
+                            return@reactionAdded
+                        }
+                        val newName: String = nickRequestMessage.content.subSequence(
+                            nickRequestMessage.content.indexOf("\"") + 1,
+                            nickRequestMessage.content.indexOf(
+                                "\"",
+                                nickRequestMessage.content.indexOf("\"") + 1
+                            )
+                        ).toString()
+                        if (messageReaction.emoji.name == config.cross) {
+                            clientStore.channels[clientStore.discord.createDM(
+                                CreateDM(
+                                    nickRequestMessage.usersMentioned[0].id
+                                )
+                            ).id].sendMessage("Your rename request to \"$newName\" was rejected by an exco member.")
+                            channelClient.sendMessage(
+                                "<@!${messageReaction.userId}> has denied ${
+                                    guildClient.getMember(
+                                        nickRequestMessage.usersMentioned[0].id
+                                    ).nickname
+                                }(<@!${nickRequestMessage.usersMentioned[0].id}>)'s request to change name to \"$newName\""
+                            )
+                            nickRequestMessage.delete()
+                        } else if (messageReaction.emoji.name == config.tick) {
+                            clientStore.channels[clientStore.discord.createDM(
+                                CreateDM(
+                                    nickRequestMessage.usersMentioned[0].id
+                                )
+                            ).id].sendMessage("Your rename request to \"$newName\" was accepted by an exco member.")
+                            channelClient.sendMessage(
+                                "<@!${messageReaction.userId}> has accepted ${
+                                    guildClient.getMember(
+                                        nickRequestMessage.usersMentioned[0].id
+                                    ).nickname
+                                }(<@!${nickRequestMessage.usersMentioned[0].id}>)'s request to change name to \"$newName\""
+                            )
+                            guildClient.changeNickname(
+                                nickRequestMessage.usersMentioned[0].id,
+                                newName
+                            )
+                            nickRequestMessage.delete()
+                        }
+                    }
+                } catch (e: Exception) {
+                }
             }
         }
     }
@@ -38,59 +106,6 @@ object Nick : Command {
                 channelClient.sendMessage("${guildClient.getMember(userId).nickname}(<@!$userId>) has requested to be renamed to \"$newName\". ✅ if you want to accept the rename request, ❎ if you do not want to accept the rename request")
             renameMessage.react("✅")
             renameMessage.react("❎")
-            reactionAdded { messageReaction ->
-                try {
-                    if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
-                        val newName: String = channelClient.getMessage(messageReaction.messageId).content.subSequence(
-                            channelClient.getMessage(messageReaction.messageId).content.indexOf("\"") + 1,
-                            channelClient.getMessage(messageReaction.messageId).content.indexOf(
-                                "\"",
-                                channelClient.getMessage(messageReaction.messageId).content.indexOf("\"") + 1
-                            )
-                        ).toString()
-                        if (messageReaction.emoji.name == "❎") {
-                            clientStore.channels[clientStore.discord.createDM(
-                                CreateDM(
-                                    channelClient.getMessage(
-                                        messageReaction.messageId
-                                    ).usersMentioned[0].id
-                                )
-                            ).id].sendMessage("Your rename request to \"$newName\" was rejected by an exco member.")
-                            channelClient.sendMessage(
-                                "<@!${messageReaction.userId}> has denied ${
-                                    guildClient.getMember(
-                                        channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id
-                                    ).nickname
-                                }(<@!${channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id}>)'s request to change name to \"$newName\""
-                            )
-                            channelClient.getMessage(messageReaction.messageId).delete()
-                        } else if (messageReaction.emoji.name == "✅") {
-                            clientStore.channels[clientStore.discord.createDM(
-                                CreateDM(
-                                    channelClient.getMessage(
-                                        messageReaction.messageId
-                                    ).usersMentioned[0].id
-                                )
-                            ).id].sendMessage("Your rename request to \"$newName\" was accepted by an exco member.")
-                            channelClient.sendMessage(
-                                "<@!${messageReaction.userId}> has accepted ${
-                                    guildClient.getMember(
-                                        channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id
-                                    ).nickname
-                                }(<@!${channelClient.getMessage(messageReaction.messageId).usersMentioned[0].id}>)'s request to change name to \"$newName\""
-                            )
-                            guildClient.changeNickname(
-                                channelClient.getMessage(
-                                    messageReaction.messageId
-                                ).usersMentioned[0].id,
-                                newName
-                            )
-                            channelClient.getMessage(messageReaction.messageId).delete()
-                        }
-                    }
-                } catch (e: Exception) {
-                }
-            }
         }
     }
 }
