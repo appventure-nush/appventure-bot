@@ -2,6 +2,9 @@ package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.botId
+import app.nush.bot.commands.utils.Emojis.cross
+import app.nush.bot.commands.utils.Emojis.tick
+import app.nush.bot.commands.utils.dmUser
 import com.jessecorbett.diskord.api.rest.CreateDM
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
@@ -18,6 +21,7 @@ object Nick : Command {
         with(prefix) {
             command("nick") {
                 val newName: String = words.drop(1).joinToString(separator = " ")
+                println(newName)
                 if (newName != "") {
                     request(
                         bot,
@@ -25,35 +29,40 @@ object Nick : Command {
                         newName
                     )
                 } else {
-                    with(bot) {
-                        clientStore.channels[this@command.id].sendMessage("You may not request an empty nickname!")
-                    }
+                    dmUser(
+                        bot,
+                        authorId,
+                        "You may not request an empty nickname!"
+                    )
                 }
             }
         }
         with(bot) {
             reactionAdded { messageReaction ->
                 try {
-                    val tick = "✅"
-                    val cross = "❎"
                     if (messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
                         return@reactionAdded
                     }
                     val guildClient = clientStore.guilds[config.guildId]
                     val channelClient = clientStore.channels[config.excoChannelId]
                     if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
-                        val nickRequestMessage = channelClient.getMessage(messageReaction.messageId)
-                        if (nickRequestMessage.content.substring(nickRequestMessage.content.length - 96) != "\". ✅ if you want to accept the rename request, ❎ if you do not want to accept the rename request") {
+                        val nickRequestMessage =
+                            channelClient.getMessage(messageReaction.messageId)
+                        if (nickRequestMessage.content.substring(
+                                nickRequestMessage.content.length - 96
+                            ) != "\". $tick if you want to accept the rename request, $cross if you do not want to accept the rename request"
+                        ) {
                             return@reactionAdded
                         }
                         if (nickRequestMessage.authorId != botId) return@reactionAdded
-                        val newName: String = nickRequestMessage.content.subSequence(
-                            nickRequestMessage.content.indexOf("\"") + 1,
-                            nickRequestMessage.content.indexOf(
-                                "\"",
-                                nickRequestMessage.content.indexOf("\"") + 1
-                            )
-                        ).toString()
+                        val newName: String =
+                            nickRequestMessage.content.subSequence(
+                                nickRequestMessage.content.indexOf("\"") + 1,
+                                nickRequestMessage.content.indexOf(
+                                    "\"",
+                                    nickRequestMessage.content.indexOf("\"") + 1
+                                )
+                            ).toString()
                         if (messageReaction.emoji.name == cross) {
                             clientStore.channels[clientStore.discord.createDM(
                                 CreateDM(
@@ -104,9 +113,11 @@ object Nick : Command {
                 )
             ).id].sendMessage("Your rename request has been sent to the exco, it will be processed as soon as possible.")
             val renameMessage =
-                channelClient.sendMessage("${guildClient.getMember(userId).nickname}(<@!$userId>) has requested to be renamed to \"$newName\". ✅ if you want to accept the rename request, ❎ if you do not want to accept the rename request")
-            renameMessage.react("✅")
-            renameMessage.react("❎")
+                channelClient.sendMessage(
+                    "${guildClient.getMember(userId).nickname}(<@!$userId>) has requested to be renamed to \"$newName\". $tick if you want to accept the rename request, $cross if you do not want to accept the rename request"
+                )
+            renameMessage.react(tick)
+            renameMessage.react(cross)
         }
     }
 }

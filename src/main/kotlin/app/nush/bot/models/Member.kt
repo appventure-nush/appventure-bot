@@ -1,4 +1,4 @@
-package app.nush.bot.commands
+package app.nush.bot.models
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.list

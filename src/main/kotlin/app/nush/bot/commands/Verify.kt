@@ -2,7 +2,10 @@ package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.botId
-import app.nush.bot.commands.Member.Companion.members
+import app.nush.bot.commands.utils.Emojis.cross
+import app.nush.bot.commands.utils.Emojis.hatEmote
+import app.nush.bot.commands.utils.Emojis.tick
+import app.nush.bot.models.Member.Companion.members
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingRequests
 import app.nush.bot.url
@@ -32,9 +35,6 @@ object Verify : Command {
         with(bot) {
             reactionAdded { messageReaction ->
                 try {
-                    val tick = "✅"
-                    val cross = "❎"
-                    val hatEmote = "\uD83C\uDF93"
                     if (messageReaction.emoji.name != hatEmote && messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
                         return@reactionAdded
                     }
@@ -43,7 +43,10 @@ object Verify : Command {
                     if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
                         val accessRequestMessage =
                             channelClient.getMessage(messageReaction.messageId)
-                        if (accessRequestMessage.content.substring(accessRequestMessage.content.length - 230) != ">) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server") {
+                        if (accessRequestMessage.content.substring(
+                                accessRequestMessage.content.length - 230
+                            ) != ">) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server"
+                        ) {
                             return@reactionAdded
                         }
                         if (accessRequestMessage.authorId != botId) return@reactionAdded
@@ -160,10 +163,10 @@ object Verify : Command {
                     )
                 ).id].sendMessage("As you are not a present appventure member, your join request has been forwarded to the exco")
                 val accessMessage =
-                    channelClient.sendMessage("$name(<@!$discordUserId>) is requesting to access the server, react with \uD83C\uDF93 if you want to allow them to access the server as an alumni, ✅ if you want to allow them to access the server as a guest, ❎ if you do not want to allow them to access the server")
-                accessMessage.react("\uD83C\uDF93")
-                accessMessage.react("✅")
-                accessMessage.react("❎")
+                    channelClient.sendMessage("$name(<@!$discordUserId>) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server")
+                accessMessage.react(hatEmote)
+                accessMessage.react(tick)
+                accessMessage.react(cross)
             } else {
                 clientStore.channels[channel.id].sendMessage("Welcome, $name")
             }
