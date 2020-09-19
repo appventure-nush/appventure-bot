@@ -45,10 +45,7 @@ object Verify : Command {
                 val channelClient = clientStore.channels[config.excoChannelId]
                 val accessRequestMessage =
                     channelClient.getMessage(messageReaction.messageId)
-                if (accessRequestMessage.content.substring(
-                        accessRequestMessage.content.length - 230
-                    ) != ">) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server"
-                ) {
+                if ("is requesting to access the server" !in accessRequestMessage.content) {
                     return@reactionAdded
                 }
                 if (accessRequestMessage.authorId != botId) return@reactionAdded

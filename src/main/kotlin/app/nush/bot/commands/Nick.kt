@@ -46,12 +46,8 @@ object Nick : Command {
                 if (messageReaction.userId == botId) {
                     return@reactionAdded
                 }
-                val nickRequestMessage =
-                    channelClient.getMessage(messageReaction.messageId)
-                if (nickRequestMessage.content.substring(
-                        nickRequestMessage.content.length - 96
-                    ) != "\". $tick if you want to accept the rename request, $cross if you do not want to accept the rename request"
-                ) {
+                val nickRequestMessage = channelClient.getMessage(messageReaction.messageId)
+                if ("has requested to be renamed to" !in nickRequestMessage.content) {
                     return@reactionAdded
                 }
                 if (nickRequestMessage.authorId != botId) return@reactionAdded
