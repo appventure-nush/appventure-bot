@@ -5,6 +5,7 @@ import app.nush.bot.botId
 import app.nush.bot.commands.utils.Emojis.cross
 import app.nush.bot.commands.utils.Emojis.hatEmote
 import app.nush.bot.commands.utils.Emojis.tick
+import app.nush.bot.commands.utils.dmUser
 import app.nush.bot.models.Member.Companion.members
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingRequests
@@ -29,86 +30,83 @@ object Verify : Command {
         this.bot = bot
         with(prefix) {
             command("sendverify") {
-                userVerified(User("SU ZHENGCHONG", "h1810141@nushigh.edu.sg", 0), authorId)
+                sendVerifyMessage(bot, authorId)
             }
         }
         with(bot) {
             reactionAdded { messageReaction ->
-                try {
-                    if (messageReaction.emoji.name != hatEmote && messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
-                        return@reactionAdded
-                    }
-                    val guildClient = clientStore.guilds[config.guildId]
-                    val channelClient = clientStore.channels[config.excoChannelId]
-                    if (!guildClient.getMember(messageReaction.userId).user?.isBot!!) {
-                        val accessRequestMessage =
-                            channelClient.getMessage(messageReaction.messageId)
-                        if (accessRequestMessage.content.substring(
-                                accessRequestMessage.content.length - 230
-                            ) != ">) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server"
-                        ) {
-                            return@reactionAdded
-                        }
-                        if (accessRequestMessage.authorId != botId) return@reactionAdded
-                        when (messageReaction.emoji.name) {
-                            hatEmote -> {
-                                clientStore.channels[clientStore.discord.createDM(
-                                    CreateDM(accessRequestMessage.usersMentioned[0].id)
-                                ).id].sendMessage(
-                                    "An exco has allowed your access to the AppVenture server as an alumni."
-                                )
-                                channelClient.sendMessage(
-                                    "<@!${messageReaction.userId}> has allowed ${
-                                        guildClient.getMember(
-                                            accessRequestMessage.usersMentioned[0].id
-                                        ).nickname
-                                    }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server as an alumni."
-                                )
-                                guildClient.addMemberRole(
-                                    accessRequestMessage.usersMentioned[0].id,
-                                    config.alumniRole
-                                )
-                                accessRequestMessage.delete()
-                            }
-                            cross -> {
-                                clientStore.channels[clientStore.discord.createDM(
-                                    CreateDM(
-                                        accessRequestMessage.usersMentioned[0].id
-                                    )
-                                ).id].sendMessage("You were kicked from the AppVenture server because an exco denied your access.")
-                                channelClient.sendMessage(
-                                    "<@!${messageReaction.userId}> has denied ${
-                                        guildClient.getMember(
-                                            accessRequestMessage.usersMentioned[0].id
-                                        ).nickname
-                                    }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server."
-                                )
-                                guildClient.removeMember(accessRequestMessage.usersMentioned[0].id)
-                                accessRequestMessage.delete()
-                            }
-                            tick -> {
-                                clientStore.channels[clientStore.discord.createDM(
-                                    CreateDM(
-                                        accessRequestMessage.usersMentioned[0].id
-                                    )
-                                ).id].sendMessage("An exco has allowed your access to the AppVenture server as a guest.")
-                                channelClient.sendMessage(
-                                    "<@!${messageReaction.userId}> has allowed ${
-                                        guildClient.getMember(
-                                            accessRequestMessage.usersMentioned[0].id
-                                        ).nickname
-                                    }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server as a guest."
-                                )
-                                guildClient.addMemberRole(
-                                    accessRequestMessage.usersMentioned[0].id,
-                                    config.guestRole
-                                )
-                                accessRequestMessage.delete()
-                            }
-                        }
-                        }
-                } catch (e: Exception) {
+                if (messageReaction.userId == botId) {
                     return@reactionAdded
+                }
+                if (messageReaction.emoji.name != hatEmote && messageReaction.emoji.name != cross && messageReaction.emoji.name != tick) {
+                    return@reactionAdded
+                }
+                val guildClient = clientStore.guilds[config.guildId]
+                val channelClient = clientStore.channels[config.excoChannelId]
+                val accessRequestMessage =
+                    channelClient.getMessage(messageReaction.messageId)
+                if (accessRequestMessage.content.substring(
+                        accessRequestMessage.content.length - 230
+                    ) != ">) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server"
+                ) {
+                    return@reactionAdded
+                }
+                if (accessRequestMessage.authorId != botId) return@reactionAdded
+                when (messageReaction.emoji.name) {
+                    hatEmote -> {
+                        dmUser(
+                            bot,
+                            accessRequestMessage.usersMentioned[0].id,
+                            "An exco has allowed your access to the AppVenture server as an alumni."
+                        )
+                        channelClient.sendMessage(
+                            "<@!${messageReaction.userId}> has allowed ${
+                                guildClient.getMember(
+                                    accessRequestMessage.usersMentioned[0].id
+                                ).nickname
+                            }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server as an alumni."
+                        )
+                        guildClient.addMemberRole(
+                            accessRequestMessage.usersMentioned[0].id,
+                            config.alumniRole
+                        )
+                        accessRequestMessage.delete()
+                    }
+                    cross -> {
+                        dmUser(
+                            bot,
+                            accessRequestMessage.usersMentioned[0].id,
+                            "You were kicked from the AppVenture server because an exco denied your access."
+                        )
+                        channelClient.sendMessage(
+                            "<@!${messageReaction.userId}> has denied ${
+                                guildClient.getMember(
+                                    accessRequestMessage.usersMentioned[0].id
+                                ).nickname
+                            }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server."
+                        )
+                        guildClient.removeMember(accessRequestMessage.usersMentioned[0].id)
+                        accessRequestMessage.delete()
+                    }
+                    tick -> {
+                        dmUser(
+                            bot,
+                            accessRequestMessage.usersMentioned[0].id,
+                            "An exco has allowed your access to the AppVenture server as a guest."
+                        )
+                        channelClient.sendMessage(
+                            "<@!${messageReaction.userId}> has allowed ${
+                                guildClient.getMember(
+                                    accessRequestMessage.usersMentioned[0].id
+                                ).nickname
+                            }(<@!${accessRequestMessage.usersMentioned[0].id}>) to access the server as a guest."
+                        )
+                        guildClient.addMemberRole(
+                            accessRequestMessage.usersMentioned[0].id,
+                            config.guestRole
+                        )
+                        accessRequestMessage.delete()
+                    }
                 }
             }
         }
@@ -157,11 +155,11 @@ object Verify : Command {
                 )
             }
             if (!userIsAppVentureMember) {
-                clientStore.channels[clientStore.discord.createDM(
-                    CreateDM(
-                        discordUserId
-                    )
-                ).id].sendMessage("As you are not a present appventure member, your join request has been forwarded to the exco")
+                dmUser(
+                    bot,
+                    discordUserId,
+                    "As you are not a present appventure member, your join request has been forwarded to the exco"
+                )
                 val accessMessage =
                     channelClient.sendMessage("$name(<@!$discordUserId>) is requesting to access the server, react with $hatEmote if you want to allow them to access the server as an alumni, $tick if you want to allow them to access the server as a guest, $cross if you do not want to allow them to access the server")
                 accessMessage.react(hatEmote)
