@@ -8,5 +8,6 @@ WORKDIR /home/bot/bot
 COPY --chown=bot:root build/libs/*.jar ./bot.jar
 COPY --chown=bot:root config.json.enc .
 RUN mkdir data
+COPY --chown=bot:root data/members.json.enc data
 RUN chown -R bot:root .
 USER bot
