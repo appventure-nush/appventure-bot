@@ -30,10 +30,7 @@ object Verify : Command {
         this.bot = bot
         with(prefix) {
             command("sendverify") {
-                userVerified(
-                    User("LAM JUN RONG", "h171004@nushigh.edu.sg", 0),
-                    "585449672584331265"
-                )
+                sendVerifyMessage(bot, authorId)
             }
         }
         with(bot) {
