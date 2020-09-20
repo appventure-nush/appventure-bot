@@ -5,6 +5,7 @@ on:
     branches-ignore:
       - master
   pull_request:
+    types: [ opened ]
 
 jobs:
   build:

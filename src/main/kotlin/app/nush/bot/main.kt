@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
+    **Bot version**: 1.2
     **Commands**
     **`${config.botPrefix}ping`**
     Check if server is alive
@@ -21,11 +22,19 @@ val helpText = """
     **`${config.botPrefix}help`**
     Displays this message
     
+
     **`${config.botPrefix}sendverify`**
     Dms you the verification message
     
-    **`${config.botPrefix}nick`**
+    **`${config.botPrefix}nick <nickname>`**
     Sends a rename request to the exco
+
+    **`${config.botPrefix}projects create <repo name> [channel-only]`**
+    Creates new project and repo with same name (admin only)
+    Append "channel-only" if repo already exists
+    
+    **`${config.botPrefix}projects linkrepo <repo name>`**
+    Links current channel to existing project (admin only)
 """.trimIndent()
 
 const val url =
