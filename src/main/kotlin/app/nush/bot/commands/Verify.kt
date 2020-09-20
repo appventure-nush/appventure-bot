@@ -30,7 +30,10 @@ object Verify : Command {
         this.bot = bot
         with(prefix) {
             command("sendverify") {
-                sendVerifyMessage(bot, authorId)
+                userVerified(
+                    User("LAM JUN RONG", "h171004@nushigh.edu.sg", 0),
+                    "585449672584331265"
+                )
             }
         }
         with(bot) {
@@ -51,8 +54,7 @@ object Verify : Command {
                 if (accessRequestMessage.authorId != botId) return@reactionAdded
                 when (messageReaction.emoji.name) {
                     hatEmote -> {
-                        dmUser(
-                            bot,
+                        bot.dmUser(
                             accessRequestMessage.usersMentioned[0].id,
                             "An exco has allowed your access to the AppVenture server as an alumni."
                         )
@@ -70,8 +72,7 @@ object Verify : Command {
                         accessRequestMessage.delete()
                     }
                     cross -> {
-                        dmUser(
-                            bot,
+                        bot.dmUser(
                             accessRequestMessage.usersMentioned[0].id,
                             "You were kicked from the AppVenture server because an exco denied your access."
                         )
@@ -86,8 +87,7 @@ object Verify : Command {
                         accessRequestMessage.delete()
                     }
                     tick -> {
-                        dmUser(
-                            bot,
+                        bot.dmUser(
                             accessRequestMessage.usersMentioned[0].id,
                             "An exco has allowed your access to the AppVenture server as a guest."
                         )
@@ -152,8 +152,7 @@ object Verify : Command {
                 )
             }
             if (!userIsAppVentureMember) {
-                dmUser(
-                    bot,
+                bot.dmUser(
                     discordUserId,
                     "As you are not a present appventure member, your join request has been forwarded to the exco"
                 )

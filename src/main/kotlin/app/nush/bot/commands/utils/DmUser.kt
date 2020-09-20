@@ -4,11 +4,11 @@ import com.jessecorbett.diskord.api.rest.CreateDM
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.util.sendMessage
 
-suspend fun dmUser(bot: Bot, userId: String, message: String) {
-    val channel = bot.clientStore.discord.createDM(
+suspend fun Bot.dmUser(userId: String, message: String) {
+    val channel = this.clientStore.discord.createDM(
         CreateDM(
             userId
         )
     )
-    bot.clientStore.channels[channel.id].sendMessage(message)
+    this.clientStore.channels[channel.id].sendMessage(message)
 }

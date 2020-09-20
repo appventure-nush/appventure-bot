@@ -20,7 +20,6 @@ object Nick : Command {
         with(prefix) {
             command("nick") {
                 val newName: String = words.drop(1).joinToString(separator = " ")
-                println(newName)
                 if (newName != "") {
                     request(
                         bot,
@@ -28,8 +27,7 @@ object Nick : Command {
                         newName
                     )
                 } else {
-                    dmUser(
-                        bot,
+                    bot.dmUser(
                         authorId,
                         "You may not request an empty nickname!"
                     )
@@ -60,8 +58,7 @@ object Nick : Command {
                         )
                     ).toString()
                 if (messageReaction.emoji.name == cross) {
-                    dmUser(
-                        bot,
+                    bot.dmUser(
                         nickRequestMessage.usersMentioned[0].id,
                         "Your rename request to \"$newName\" was rejected by an exco member."
                     )
@@ -74,8 +71,7 @@ object Nick : Command {
                     )
                     nickRequestMessage.delete()
                 } else {
-                    dmUser(
-                        bot,
+                    bot.dmUser(
                         nickRequestMessage.usersMentioned[0].id,
                         "Your rename request to \"$newName\" was accepted by an exco member."
                     )
@@ -101,7 +97,6 @@ object Nick : Command {
             val guildClient = clientStore.guilds[config.guildId]
             val channelClient = clientStore.channels[config.excoChannelId]
             dmUser(
-                Verify.bot,
                 discordUserId,
                 "Your rename request has been sent to the exco, it will be processed as soon as possible."
             )
