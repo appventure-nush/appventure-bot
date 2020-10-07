@@ -159,10 +159,7 @@ object Projects : Command {
                         urlstr, "content_type" to "json", "insecure_ssl" to "0"
             ),
             listOf(
-                GHEvent.PUSH,
-                GHEvent.PULL_REQUEST,
-                GHEvent.PULL_REQUEST_REVIEW,
-                GHEvent.PULL_REQUEST_REVIEW_COMMENT
+                GHEvent.ALL
             ),
             true
         )
