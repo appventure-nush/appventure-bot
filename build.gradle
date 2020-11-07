@@ -29,7 +29,9 @@ dependencies {
     implementation "com.junron.pyrobase:json-cache:1.2"
     implementation "org.kohsuke:github-api:1.116"
     implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-client-cio:$ktor_version"
     implementation "com.bettercloud:vault-java-driver:5.1.0"
 }
 mainClassName = "app.nush.bot.MainKt"

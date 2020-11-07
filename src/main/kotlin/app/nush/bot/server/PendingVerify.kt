@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 val pendingRequests = Storage("pendingRequests", PendingVerify.serializer())
+val pendingGithubRequests =
+    Storage("pendingGithubRequests", PendingVerify.serializer())
 
 @Serializable
 data class PendingVerify(

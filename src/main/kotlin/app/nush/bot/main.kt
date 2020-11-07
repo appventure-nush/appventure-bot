@@ -2,6 +2,7 @@ package app.nush.bot
 
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.commands.GithubVerify
 import app.nush.bot.commands.Nick
 import app.nush.bot.commands.Projects
 import app.nush.bot.commands.Verify
@@ -62,6 +63,9 @@ suspend fun main() {
         }
         commands("${config.botPrefix}projects ") {
             Projects.init(this@bot, this)
+        }
+        commands("${config.botPrefix}github ") {
+            GithubVerify.init(this@bot, this)
         }
 
         userJoinedGuild {
