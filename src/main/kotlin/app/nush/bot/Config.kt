@@ -18,7 +18,9 @@ data class Config(
     val alumniRole: String = "",
     val guestRole: String = "",
     val excoChannelId: String = "",
-    val githubToken: String = ""
+    val githubToken: String = "",
+    val githubClientId: String = "",
+    val githubClientSecret: String = ""
 ) {
     companion object {
         val config: Config by lazy {
