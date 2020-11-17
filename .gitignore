@@ -3,3 +3,4 @@
 /build/
 /config.json
 data/*.json
+/data/data.db

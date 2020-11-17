@@ -1,12 +1,12 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.DB
 import app.nush.bot.botId
 import app.nush.bot.commands.utils.Emojis.cross
 import app.nush.bot.commands.utils.Emojis.hatEmote
 import app.nush.bot.commands.utils.Emojis.tick
 import app.nush.bot.commands.utils.dmUser
-import app.nush.bot.models.Member.Companion.members
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingRequests
 import app.nush.bot.url
@@ -137,18 +137,18 @@ object Verify : Command {
     suspend fun userVerified(user: User, discordUserId: String) {
         val name = user.name.toLowerCase().capitalizeWords()
         with(bot) {
-            var userIsAppVentureMember = false
+            val appventureMember = DB.getMemberByEmail(user.email)
             val channel = clientStore.discord.createDM(CreateDM(discordUserId))
             val guildClient = clientStore.guilds[config.guildId]
             val channelClient = clientStore.channels[config.excoChannelId]
-            if (members.any { it.email == user.email }) {
-                userIsAppVentureMember = true
+            if (appventureMember != null) {
+                clientStore.channels[channel.id].sendMessage("Welcome, $name")
                 guildClient.addMemberRole(
                     discordUserId,
                     config.memberRole
                 )
-            }
-            if (!userIsAppVentureMember) {
+                DB.setDiscord(user.email, discordUserId.toLong())
+            } else {
                 bot.dmUser(
                     discordUserId,
                     "As you are not a present appventure member, your join request has been forwarded to the exco"
@@ -158,8 +158,6 @@ object Verify : Command {
                 accessMessage.react(hatEmote)
                 accessMessage.react(tick)
                 accessMessage.react(cross)
-            } else {
-                clientStore.channels[channel.id].sendMessage("Welcome, $name")
             }
             guildClient.changeNickname(
                 discordUserId,
