@@ -2,6 +2,7 @@ package app.nush.bot
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.*
 
 object Members : Table() {
     val email = varchar("id", 8)
@@ -11,6 +12,24 @@ object Members : Table() {
 
     override val primaryKey = PrimaryKey(email)
 }
+
+val ResultRow.year: Int
+    get() {
+        val email = this[Members.email]
+        val entryYear = email.substring(1..2).toInt()
+        val entryLevel = email[3].toString().toInt()
+        return (Calendar.getInstance()
+            .get(Calendar.YEAR) % 100 - entryYear) + entryLevel
+    }
+
+val ResultRow.email: String
+    get() = this[Members.email]
+val ResultRow.name: String
+    get() = this[Members.name]
+val ResultRow.discordID: Long?
+    get() = this[Members.discordID]
+val ResultRow.githubUsername: String?
+    get() = this[Members.githubUsername]
 
 object DB {
     init {
@@ -60,6 +79,14 @@ object DB {
             }) {
                 it[discordID] = discordId
             }
+        }
+    }
+}
+
+fun main() {
+    DB.getMembers().forEach {
+        if (it.year == 6) {
+            println(it.name)
         }
     }
 }
