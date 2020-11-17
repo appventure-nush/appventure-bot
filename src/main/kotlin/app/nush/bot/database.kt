@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 object Members : Table() {
-    val email = varchar("id", 8)
+    val email = varchar("id", 23)
     val name = varchar("name", 100)
     val discordID = long("discordID").nullable()
     val githubUsername = varchar("github", 100).nullable()
