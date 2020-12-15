@@ -1,6 +1,7 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.commands.Github.org
 import app.nush.bot.commands.utils.isExco
 import com.jessecorbett.diskord.api.model.*
 import com.jessecorbett.diskord.api.rest.CreateChannel
@@ -12,7 +13,6 @@ import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import org.kohsuke.github.GHEvent
-import org.kohsuke.github.GitHubBuilder
 
 object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
@@ -138,8 +138,6 @@ object Projects : Command {
     }
 
     private fun createWH(projName: String, id: String, token: String, newRepo: Boolean): Boolean {
-        val org = GitHubBuilder().withOAuthToken(config.githubToken).build()
-            .getOrganization("appventure-nush")
         val repo = if (newRepo)
             org.createRepository(projName).create()
         else

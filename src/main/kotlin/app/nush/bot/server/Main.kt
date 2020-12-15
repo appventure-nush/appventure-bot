@@ -1,7 +1,7 @@
 package app.nush.bot.server
 
 import app.nush.bot.Config.Companion.config
-import app.nush.bot.commands.GithubVerify
+import app.nush.bot.commands.Github
 import app.nush.bot.commands.Verify
 import com.junron.pyrobase.msauth.Either
 import com.junron.pyrobase.msauth.User
@@ -111,7 +111,7 @@ fun Application.module() {
                         "Error: malformed response"
                     }
                 val user = GitHubBuilder().withOAuthToken(token).build().myself
-                GithubVerify.userVerified(user, request.discordUserId)
+                Github.userVerified(user, request.discordUserId)
                 call.respondText {
                     "Welcome, ${user.login}! You may close this page now."
                 }

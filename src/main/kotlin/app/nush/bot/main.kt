@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
-    **Bot version**: 1.3
+    **Bot version**: 1.4
     **Commands**
     **`${config.botPrefix}ping`**
     Check if server is alive
@@ -20,6 +20,8 @@ val helpText = """
     **`${config.botPrefix}help`**
     Displays this message
     
+    **`${config.botPrefix}nick <nickname>`**
+    Sends a rename request to the exco
 
     **`${config.botPrefix}sendverify`**
     Dms you the verification message
@@ -28,15 +30,19 @@ val helpText = """
     **`${config.botPrefix}github verify`**
     DMs a GitHub verification message
     
-    **`${config.botPrefix}nick <nickname>`**
-    Sends a rename request to the exco
-
+    **`${config.botPrefix}github share <repo name> <mentions>`**
+    Adds mentioned users to specified GitHub repository. Users must have a registered GitHub account.
+    May not work if user is not already in AppVenture organization (admin only)
+    
     **`${config.botPrefix}projects create <repo name> [channel-only]`**
     Creates new project and repo with same name (admin only)
     Append "channel-only" if repo already exists
     
     **`${config.botPrefix}projects linkrepo <repo name>`**
     Links current channel to existing project (admin only)
+    
+    **`${config.botPrefix}import`**
+    Imports members from attached CSV file (admin only)
 """.trimIndent()
 
 const val url =
@@ -67,7 +73,7 @@ suspend fun main() {
             Projects.init(this@bot, this)
         }
         commands("${config.botPrefix}github ") {
-            GithubVerify.init(this@bot, this)
+            Github.init(this@bot, this)
         }
 
         userJoinedGuild {
