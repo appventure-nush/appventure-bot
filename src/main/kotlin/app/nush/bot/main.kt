@@ -2,10 +2,7 @@ package app.nush.bot
 
 
 import app.nush.bot.Config.Companion.config
-import app.nush.bot.commands.GithubVerify
-import app.nush.bot.commands.Nick
-import app.nush.bot.commands.Projects
-import app.nush.bot.commands.Verify
+import app.nush.bot.commands.*
 import app.nush.bot.server.startServer
 import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
@@ -64,6 +61,7 @@ suspend fun main() {
             }
             Verify.init(this@bot, this)
             Nick.init(this@bot, this)
+            Import.init(this@bot, this)
         }
         commands("${config.botPrefix}projects ") {
             Projects.init(this@bot, this)

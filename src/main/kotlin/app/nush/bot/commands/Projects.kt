@@ -1,6 +1,7 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.commands.utils.isExco
 import com.jessecorbett.diskord.api.model.*
 import com.jessecorbett.diskord.api.rest.CreateChannel
 import com.jessecorbett.diskord.api.rest.CreateGuildRole
@@ -19,9 +20,7 @@ object Projects : Command {
             with(prefix) {
                 command("create") {
                     val guildId = guildId ?: return@command
-                    val roles =
-                        clientStore.guilds[guildId].getMember(authorId).roleIds
-                    if (config.excoRole !in roles && !config.dev) {
+                    if (!isExco(authorId, guildId, bot)) {
                         reply("You are not authorized")
                         return@command
                     }
@@ -118,9 +117,7 @@ object Projects : Command {
                 }
                 command("linkrepo") {
                     val guildId = guildId ?: return@command
-                    val roles =
-                        clientStore.guilds[guildId].getMember(authorId).roleIds
-                    if (config.excoRole !in roles && !config.dev) {
+                    if (!isExco(authorId, guildId, bot)) {
                         reply("You are not authorized")
                         return@command
                     }

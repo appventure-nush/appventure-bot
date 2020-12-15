@@ -36,5 +36,6 @@ dependencies {
     implementation "org.jetbrains.exposed:exposed-core:0.24.1"
     implementation "org.jetbrains.exposed:exposed-jdbc:0.24.1"
     implementation "org.xerial:sqlite-jdbc:3.32.3.2"
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.14.0'
 }
 mainClassName = "app.nush.bot.MainKt"

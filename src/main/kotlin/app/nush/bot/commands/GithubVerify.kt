@@ -1,7 +1,9 @@
 package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
+import app.nush.bot.DB
 import app.nush.bot.commands.utils.dmUser
+import app.nush.bot.email
 import app.nush.bot.server.PendingVerify
 import app.nush.bot.server.pendingGithubRequests
 import com.jessecorbett.diskord.api.rest.CreateDM
@@ -22,6 +24,12 @@ object GithubVerify : Command {
                 command("verify") {
                     val channel =
                         clientStore.discord.createDM(CreateDM(authorId))
+                    val dbUser = DB.getMemberByDiscordId(authorId.toLong())
+                    println(dbUser)
+                    if (dbUser == null) {
+                        clientStore.channels[channel.id].sendMessage("Please verify your Office 365 account first by typing `!sendverify`")
+                        return@command
+                    }
                     val request = PendingVerify(
                         discordUserId = authorId,
                         timestamp = System.currentTimeMillis()
@@ -46,5 +54,7 @@ object GithubVerify : Command {
             discordId,
             "Your GitHub account ${user.login} has been linked."
         )
+        val dbUser = DB.getMemberByDiscordId(discordId.toLong()) ?: return
+        DB.setGithub(dbUser.email, user.login)
     }
 }

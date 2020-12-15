@@ -64,6 +64,15 @@ object DB {
         }
     }
 
+    fun getMemberByDiscordId(discordId: Long): ResultRow? {
+        return transaction {
+            Members.select {
+                Members.discordID eq discordId
+            }.map { it }.getOrNull(0)
+        }
+    }
+
+
     fun getMembers(): List<ResultRow> {
         return transaction {
             return@transaction Members.selectAll().map {
@@ -81,6 +90,16 @@ object DB {
             }
         }
     }
+
+    fun setGithub(id: String, github: String) {
+        transaction {
+            Members.update({
+                Members.email eq id
+            }) {
+                it[githubUsername] = github
+            }
+        }
+    }
 }
 
 fun main() {
@@ -89,4 +108,5 @@ fun main() {
             println(it.name)
         }
     }
+
 }
