@@ -39,7 +39,6 @@ object Github : Command {
                     val channel =
                         clientStore.discord.createDM(CreateDM(authorId))
                     val dbUser = DB.getMemberByDiscordId(authorId.toLong())
-                    println(dbUser)
                     if (dbUser == null) {
                         clientStore.channels[channel.id].sendMessage("Please verify your Office 365 account first by typing `!sendverify`")
                         return@command
