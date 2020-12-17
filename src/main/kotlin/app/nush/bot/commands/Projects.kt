@@ -2,15 +2,13 @@ package app.nush.bot.commands
 
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.commands.Github.org
-import app.nush.bot.commands.utils.isExco
+import app.nush.bot.commands.utils.excoCommand
 import com.jessecorbett.diskord.api.model.*
 import com.jessecorbett.diskord.api.rest.CreateChannel
 import com.jessecorbett.diskord.api.rest.CreateGuildRole
 import com.jessecorbett.diskord.api.rest.CreateWebhook
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet
-import com.jessecorbett.diskord.dsl.command
-import com.jessecorbett.diskord.util.authorId
 import com.jessecorbett.diskord.util.words
 import org.kohsuke.github.GHEvent
 
@@ -18,25 +16,20 @@ object Projects : Command {
     override fun init(bot: Bot, prefix: CommandSet) {
         with(bot) {
             with(prefix) {
-                command("create") {
-                    val guildId = guildId ?: return@command
-                    if (!isExco(authorId, guildId, bot)) {
-                        reply("You are not authorized")
-                        return@command
-                    }
+                excoCommand("create") {
                     val channelOnly = words.last() == "channel-only"
                     val cutWords = words.filter { it != "channel-only" }
                     if (cutWords.size < 3) {
                         reply("Please specify a project name")
-                        return@command
+                        return@excoCommand
                     }
                     val projName =
                         cutWords.slice(2..cutWords.lastIndex).joinToString("-")
                             .toLowerCase().trim()
-                    val guild = bot.clientStore.guilds[guildId]
+                    val guild = bot.clientStore.guilds[config.guildId]
                     if (guild.getRoles().any { it.name == projName }) {
                         reply("Project already exists")
-                        return@command
+                        return@excoCommand
                     }
                     val role = guild.createRole(
                         CreateGuildRole(
@@ -49,7 +42,7 @@ object Projects : Command {
                     // @everyone role has same id as guildId
                     // https://discord.com/developers/docs/topics/permissions#role-object
                     val denyAll = Overwrite(
-                        guildId,
+                        config.guildId,
                         OverwriteType.ROLE,
                         Permissions.NONE,
                         Permissions.ALL
@@ -109,26 +102,31 @@ object Projects : Command {
 
                     if (!channelOnly) {
                         val discordWebhook =
-                            bot.clientStore.channels[channel.id].createWebhook(CreateWebhook("For GitHub"))
-                        createWH(projName, discordWebhook.id, discordWebhook.token, true)
+                            bot.clientStore.channels[channel.id].createWebhook(
+                                CreateWebhook("For GitHub"))
+                        createWH(projName,
+                            discordWebhook.id,
+                            discordWebhook.token,
+                            true)
                         reply("GitHub repository $projName created")
                         reply("Link: https://github.com/appventure-nush/$projName")
                     }
                 }
-                command("linkrepo") {
-                    val guildId = guildId ?: return@command
-                    if (!isExco(authorId, guildId, bot)) {
-                        reply("You are not authorized")
-                        return@command
-                    }
+                excoCommand("linkrepo") {
                     if (words.size < 3) {
                         reply("Please specify a project name")
-                        return@command
+                        return@excoCommand
                     }
                     val projName = words[2]
-                    val discordWebhook = bot.clientStore.channels[channelId].createWebhook(CreateWebhook("For GitHub"))
+                    val discordWebhook =
+                        bot.clientStore.channels[channelId].createWebhook(
+                            CreateWebhook("For GitHub"))
 
-                    if (createWH(projName, discordWebhook.id, discordWebhook.token, false))
+                    if (createWH(projName,
+                            discordWebhook.id,
+                            discordWebhook.token,
+                            false)
+                    )
                         reply("Successfully linked <#${channelId}> with $projName")
                     else
                         reply("Repository does not exist")

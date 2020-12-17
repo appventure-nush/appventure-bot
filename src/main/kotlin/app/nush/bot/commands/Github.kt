@@ -3,7 +3,7 @@ package app.nush.bot.commands
 import app.nush.bot.Config.Companion.config
 import app.nush.bot.DB
 import app.nush.bot.commands.utils.dmUser
-import app.nush.bot.commands.utils.isExco
+import app.nush.bot.commands.utils.excoCommand
 import app.nush.bot.email
 import app.nush.bot.githubUsername
 import app.nush.bot.name
@@ -58,19 +58,14 @@ object Github : Command {
                         color = Colors.GREEN
                     }
                 }
-                command("share") {
-                    val guildId = guildId ?: return@command
-                    if (!isExco(authorId, guildId, bot)) {
-                        reply("You are not authorized")
-                        return@command
-                    }
+                excoCommand("share") {
                     if (words.size < 4) {
                         reply("Specify repo name and user")
-                        return@command
+                        return@excoCommand
                     }
                     if (usersMentioned.isEmpty()) {
                         reply("You must mention at least one member.")
-                        return@command
+                        return@excoCommand
                     }
                     val members = usersMentioned.mapNotNull {
                         DB.getMemberByDiscordId(it.id.toLong()) ?: run {
@@ -79,7 +74,7 @@ object Github : Command {
                         }
                     }
                     if (members.size != usersMentioned.size) {
-                        return@command
+                        return@excoCommand
                     }
                     val usernames = members.mapNotNull {
                         it.githubUsername ?: run {
@@ -88,12 +83,12 @@ object Github : Command {
                         }
                     }
                     if (usernames.size != usersMentioned.size) {
-                        return@command
+                        return@excoCommand
                     }
                     val repoName = words[2]
                     val repo = org.getRepository(repoName) ?: run {
                         reply("Repo $repoName could not be found")
-                        return@command
+                        return@excoCommand
                     }
                     val users = usernames.mapNotNull {
                         github.getUser(it) ?: run {
@@ -102,7 +97,7 @@ object Github : Command {
                         }
                     }
                     if (users.size != usernames.size) {
-                        return@command
+                        return@excoCommand
                     }
                     repo.addCollaborators(users,
                         GHOrganization.Permission.MAINTAIN)

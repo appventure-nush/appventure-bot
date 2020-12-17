@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
-    **Bot version**: 1.4
+    **Bot version**: 1.4.1
     **Commands**
     **`${config.botPrefix}ping`**
     Check if server is alive
@@ -41,8 +41,14 @@ val helpText = """
     **`${config.botPrefix}projects linkrepo <repo name>`**
     Links current channel to existing project (admin only)
     
-    **`${config.botPrefix}import`**
+    **`${config.botPrefix}members import`**
     Imports members from attached CSV file (admin only)
+    
+    **`${config.botPrefix}members export`**
+    Exports members to CSV file (admin only)
+    
+    **`${config.botPrefix}members refresh`**
+    Gives alumni role to graduating Y6s (admin only)
 """.trimIndent()
 
 const val url =
@@ -67,7 +73,9 @@ suspend fun main() {
             }
             Verify.init(this@bot, this)
             Nick.init(this@bot, this)
-            Import.init(this@bot, this)
+        }
+        commands("${config.botPrefix}members ") {
+            MembersCommand.init(this@bot, this)
         }
         commands("${config.botPrefix}projects ") {
             Projects.init(this@bot, this)
