@@ -16,7 +16,7 @@ repositories {
     jcenter()
 
     maven {
-        url = "https://junron-public-maven-repo.s3-ap-southeast-1.amazonaws.com/release"
+        url = "https://pkg.junron.dev/release"
     }
 }
 
