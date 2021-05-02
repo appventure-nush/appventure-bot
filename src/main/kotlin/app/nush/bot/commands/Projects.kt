@@ -13,7 +13,10 @@ import com.jessecorbett.diskord.util.words
 import org.kohsuke.github.GHEvent
 
 object Projects : Command {
+    lateinit var bot: Bot
+
     override fun init(bot: Bot, prefix: CommandSet) {
+        this.bot = bot
         with(bot) {
             with(prefix) {
                 excoCommand("create") {
@@ -131,22 +134,42 @@ object Projects : Command {
                     else
                         reply("Repository does not exist")
                 }
+                excoCommand("archive") {
+                    val channelClient = channel
+                    val channel = channelClient.get()
+                    val vc =
+                        bot.clientStore.guilds[config.guildId].getChannels()
+                            .firstOrNull {
+                                it.type == ChannelType.GUILD_VOICE && it.name == channel.name + "-voice"
+                            } ?: kotlin.run {
+                            reply("No vc found")
+                            return@excoCommand
+                        }
+                    channelClient.update(channel.copy(parentId = config.archiveCategoryId))
+                    bot.clientStore.channels[vc.id].delete()
+                    reply("Archived")
+                }
             }
         }
     }
 
-    private fun createWH(projName: String, id: String, token: String, newRepo: Boolean): Boolean {
+    private fun createWH(
+        projName: String,
+        id: String,
+        token: String,
+        newRepo: Boolean
+    ): Boolean {
         val repo = if (newRepo)
             org.createRepository(projName).create()
         else
             org.getRepository(projName) ?: return false
         val urlstr = "https://discordapp.com/api/webhooks/" + id +
-                "/" + token + "/github"
+            "/" + token + "/github"
         repo.createHook(
             "web",
             mapOf(
                 "url" to
-                        urlstr, "content_type" to "json", "insecure_ssl" to "0"
+                    urlstr, "content_type" to "json", "insecure_ssl" to "0"
             ),
             listOf(
                 GHEvent.PUSH,

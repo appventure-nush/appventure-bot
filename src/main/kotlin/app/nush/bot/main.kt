@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 val helpText = """
-    **Bot version**: 1.4.1
+    **Bot version**: 1.4.2
     **Commands**
     **`${config.botPrefix}ping`**
     Check if server is alive
@@ -40,6 +40,9 @@ val helpText = """
     
     **`${config.botPrefix}projects linkrepo <repo name>`**
     Links current channel to existing project (admin only)
+    
+    **`${config.botPrefix}projects archive`**
+    Moves project channel to archive (admin only)
     
     **`${config.botPrefix}members import`**
     Imports members from attached CSV file (admin only)

@@ -1,7 +1,7 @@
 package app.nush.bot.commands.utils
 
 import app.nush.bot.Config.Companion.config
-import app.nush.bot.commands.Github.bot
+import app.nush.bot.commands.Projects.bot
 import com.jessecorbett.diskord.api.model.Message
 import com.jessecorbett.diskord.dsl.Bot
 import com.jessecorbett.diskord.dsl.CommandSet

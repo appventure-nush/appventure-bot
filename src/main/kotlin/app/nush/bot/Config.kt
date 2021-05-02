@@ -10,6 +10,7 @@ import java.io.File
 data class Config(
     val discordToken: String = "",
     val projectsCategoryId: String = "",
+    val archiveCategoryId: String = "",
     val botPrefix: String = "!",
     val guildId: String = "",
     val memberRole: String = "",
